@@ -1,7 +1,7 @@
 # Identificación de Publicaciones Desinformativas y Polarización Ideológica
 
 ## Descripción general
-Este proyecto se enfoca en detectar publicaciones potencialmente desinformativas (por ejemplo, noticias fake news). Para lograrlo, se han entrenado y comparado diversos modelos de clasificación de texto, desde enfoques de aprendizaje automático tradicional hasta métodos de aprendizaje profundo.
+Este proyecto se enfoca en detectar publicaciones potencialmente desinformativas (por ejemplo, fake news). Para lograrlo, se han entrenado y comparado diversos modelos de clasificación de texto, desde enfoques de aprendizaje automático tradicional hasta métodos de aprendizaje profundo.
 ---
 
 ## Objetivos del proyecto
@@ -15,7 +15,7 @@ Este proyecto se enfoca en detectar publicaciones potencialmente desinformativas
 ---
 
 ## Datos utilizados
-El conjunto de datos utilizado proviene de una fuente pública de noticias etiquetadas como reales o falsas. Incluye artículos de prensa en inglés tomados de agencias de noticias confiables (por ejemplo, Reuters) junto con artículos de sitios web de dudosa credibilidad o conocidos por difundir desinformación. Cada ejemplo en la base de datos contiene el título, el texto completo de la noticia y una etiqueta binaria ( label ) indicando su veracidad: 1 para noticias reales y 0 para noticias potencialmente falsas o engañosas. En total se recopilaron alrededor de 40.000 noticias, balanceadas aproximadamente entre ambos tipos (real vs. falsa).
+El conjunto de datos utilizado proviene de una fuente pública de noticias etiquetadas como reales o falsas. Incluye artículos de prensa en inglés tomados de agencias de noticias confiables (por ejemplo, Reuters) junto con artículos de sitios web de dudosa credibilidad o conocidos por difundir desinformación. Cada ejemplo en la base de datos contiene el título, el texto completo de la noticia y una etiqueta binaria ( label ) indicando su veracidad: 1 para noticias reales y 0 para noticias potencialmente falsas o engañosas. En total, la base de datos contaba con cerca de 40.000 noticias, balanceadas aproximadamente entre ambos tipos (real vs. falsa).
 
 <div align="center">
     <img src="./images/cuartiles.png" width="300" />
@@ -41,7 +41,7 @@ En este proyecto se probaron varias técnicas de representación de texto y algo
 - **Fine-tuning de BERT (Transformers)**:Finalmente, se realizó un ajuste fino de un modelo BERT en inglés sobre nuestra tarea de clasificación binaria. Usando un modelo preentrenado en inglés de HuggingFace. El fine-tuning se hizo durante 3 épocas (epochs) con un optimizador AdamW y tasas de aprendizaje bajas (2e-4, 2e-5, 2e-6), utilizando técnicas estándar para evitar sobreajuste (como validación durante el entrenamiento y selección del mejor modelo según accuracy de validación) y obteniendo el mejor resultado con tasa de aprendizaje 2e-5. Este enfoque permite que el modelo Transformer aprenda características específicas de las noticias verdaderas vs falsas directamente a partir del texto completo, potencialmente capturando matices que las representaciones anteriores puedan pasar por alto.
 
 ## Evaluación de Resultados
-Todos los modelos se evaluaron utilizando un conjunto de validación (para ajuste de hiperparámetros) y un conjunto test separado para la comparación final. A continuación se resumen los resultados de las principales configuraciones probadas, reportando métricas de Accuracy (Acc.), F1-score (F1) y ROC-AUC sobre el conjunto de prueba:
+Todos los modelos se evaluaron utilizando un conjunto de validación (para ajuste de hiperparámetros) y un conjunto de test separado para la comparación final. A continuación se resumen los resultados de las principales configuraciones probadas, reportando métricas de Accuracy (Acc.), F1-score (F1) y ROC-AUC sobre el conjunto de prueba:
 
 | Modelo (Representación)                    | Acc.  | F1    |
 |-------------------------------------------|-------|-------|
@@ -53,13 +53,13 @@ Todos los modelos se evaluaron utilizando un conjunto de validación (para ajust
 | MLP (BERT embedding [CLS])                 | ~95%  | ~95%  |
 | BERT Transformer fine-tune (HuggingFace)   | 96–97%| 96–97%|
 
-Observaciones: En general, todos los métodos lograron un desempeño muy alto en esta tarea de detección de noticias desinformativas. Los enfoques basados en TF-IDF obtuvieron accuracy alrededor del 96-97%, que inicialmente llamó la atención por su valor inusualmente alto. Investigando las características más importantes que usaba el Random Forest con TF-IDF, se confirmó que el modelo aprovechaba la presencia de ciertos términos distintivos (como la palabra "Reuters") para distinguir noticias reales. Esto explica que incluso un modelo relativamente simple alcance casi un 98% de acierto en el conjunto de datos original. Al remover esas pistas obvias del texto, la precisión bajó ligeramente pero se mantuvo alta (~96%), lo que indica que todavía existen patrones léxicos y de estilo que diferencian las noticias verdaderas de las falsas en este dataset.
+Observaciones: En general, todos los métodos lograron un desempeño muy alto en esta tarea de detección de noticias desinformativas. Los enfoques basados en TF-IDF obtuvieron un accuracy alrededor del 96-97%, que inicialmente llamó la atención por su valor inusualmente alto. Investigando las características más importantes que usaba el Random Forest con TF-IDF, se confirmó que el modelo aprovechaba la presencia de ciertos términos distintivos (como la palabra "Reuters") para distinguir noticias reales. Esto explica que incluso un modelo relativamente simple alcance casi un 98% de acierto en el conjunto de datos original. Al remover esas pistas obvias del texto, la precisión bajó ligeramente pero se mantuvo alta (~96%), lo que indica que todavía existen patrones léxicos y de estilo que diferencian las noticias verdaderas de las falsas en este dataset.
 
 Los modelos basados en Word2Vec también demostraron buen rendimiento (~95% de F1), aunque ligeramente inferior a TF-IDF en este caso. Esto puede deberse a que al promediar vectores de palabras se pierde información de orden y contexto específico que resultaba útil para la tarea. Aun así, tanto el Random Forest como la MLP con vectores promedio de Word2Vec superaron con claridad el 90% de accuracy, indicando que las noticias falsas en el corpus tienen un contenido semántico identificable de forma agregada.
 
 En cuanto a los embeddings de BERT preentrenado, se observó un caso interesante: al usarlos directamente (sin re-entrenar el modelo) y luego aplicar un clasificador encima, el desempeño inicial fue menor (F1 ~0.91 con Random Forest) en comparación con TF-IDF o Word2Vec. Esto sugiere que, sin fine- tuning, los embeddings de BERT en español no estaban optimizados para separar por sí solos la veracidad de las noticias, tal vez por diferencias de idioma o porque la distinción fake/real no es trivialmente capturada por las dimensiones más generales de BERT. Sin embargo, al utilizar una MLP que pueda introducir no linealidades sobre esos embeddings, la performance mejoró (hasta ~95% de accuracy), cerrando la brecha con los métodos anteriores.
 
-El modelo BERT ajustado finamente directamente con nuestros datos alcanzó la mejor performance global (aproximadamente 96-97% de accuracy y F1 en test), equiparable a los mejores resultados de TF- IDF pero lograda de una manera más generalizable. Este modelo Transformer fine-tune fue capaz de aprender patrones complejos del lenguaje de las noticias verdaderas y falsas. Es destacable que logró dicho rendimiento trabajando sobre texto en crudo y en español, lo que demuestra el poder de transferencia de los Transformers multilingües o en distintos idiomas. Dado que el modelo aprende internamente qué señales diferencian a cada clase, potencialmente es menos dependiente de pistas obvias como la fuente y más de qué se dice y cómo se dice en la noticia (por ejemplo, puede captar que las noticias falsas tienden a usar un lenguaje más exagerado o partidista, mientras que las reales mantienen un tono objetivo).
+El modelo BERT ajustado finamente directamente con nuestros datos alcanzó la mejor performance global (aproximadamente 96-97% de accuracy y F1 en test), equiparable a los mejores resultados de TF- IDF pero lograda de una manera más generalizable. Este modelo Transformer fine-tuned fue capaz de aprender patrones complejos del lenguaje de las noticias verdaderas y falsas. Es destacable que logró dicho rendimiento trabajando sobre texto en crudo y en español, lo que demuestra el poder de transferencia de los Transformers multilingües. Dado que el modelo aprende internamente qué señales diferencian a cada clase, potencialmente es menos dependiente de pistas obvias como la fuente y más de qué se dice y cómo se dice en la noticia (por ejemplo, puede captar que las noticias falsas tienden a usar un lenguaje más exagerado o partidista, mientras que las reales mantienen un tono objetivo).
 
 En resumen, todas las aproximaciones alcanzaron puntuaciones muy altas (F1 > 0.90) en este conjunto de datos, con ligeras ventajas para el modelo BERT fine-tune y para los clasificadores que aprovechan características lexicográficas sencillas. Estos resultados, no obstante, deben interpretarse con precaución: la alta efectividad se debe en parte a la naturaleza del dataset y sus sesgos (fuentes diferenciadas, temas específicos de las noticias falsas, etc.). En un escenario más general o con noticias menos claramente diferenciadas, es posible que se requieran métodos más sofisticados o un preprocesamiento que elimine sesgos para obtener rendimientos similares.
 
@@ -137,6 +137,13 @@ Las siguientes curvas ROC y matrices de confusión se han calculado sobre los co
 </div>
 
 #### BERT fine-tuning
+<div align="center">
+    <img src="./images/test_trans.png" width="300" />
+</div>
+
+<div align="center">
+    <img src="./images/test_trans_cm.png" width="300" />
+</div>
 
 ## Baseline basado en reglas
 Para la extensión del proyecto, se ha definido un baseline basado en reglas para clasificar noticias como FAKE (0) o REAL (1), utilizando señales simples extraídas del título, los dominios de las URLs y características de estilo asociadas al clickbait.
@@ -147,7 +154,7 @@ Una vez aprendidas estas señales, se muestran las palabras y expresiones más r
 
 En cuanto a los dominios URL, como se señaló en el análisis exploratorio inicial, el conjunto de datos incluía la palabra REUTERS en la mayoría de las noticias verdaderas. Dado que esta palabra introduce un fuerte sesgo, se decidió eliminarla del texto antes del entrenamiento. Como consecuencia, los dominios asociados a noticias verdaderas que el baseline aprende son pocos y con baja frecuencia de aparición. En contraste, el modelo identifica varios dominios que aparecen de forma mayoritaria en noticias falsas, clasificándolos como de baja credibilidad.
 
-Finalmente, se ha evaluado este baseline para analizar su rendimiento y compararlo con el resto de modelos y vectorizaciones del proyecto. Los resultados obtenidos han sido sorprendentemente buenos, especialmente en la detección de noticias falsas. Esto puede explicarse porque muchas fake news presentan un estilo claramente sensacionalista o clickbait, lo que las hace más fáciles de identificar mediante reglas simples. No obstante, existen también noticias falsas con un tono más neutro, diseñadas para imitar el estilo informativo de las noticias reales, lo que dificulta su detección. De forma similar, las noticias verdaderas suelen mantener un tono serio y objetivo, lo que puede provocar confusiones con aquellas fake news que adoptan un estilo aparentemente informativo.
+Finalmente, se ha evaluado este baseline para analizar su rendimiento y compararlo con el resto de modelos y vectorizaciones del proyecto. Los resultados obtenidos han sido sorprendentemente buenos, especialmente en la detección de noticias falsas. Esto puede explicarse porque muchas fake news presentan un estilo claramente sensacionalista o sospechoso de ser clickbait, lo que las hace más fáciles de identificar mediante reglas simples. No obstante, existen también noticias falsas con un tono más neutro, diseñadas para imitar el estilo informativo de las noticias reales, lo que dificulta su detección. De forma similar, las noticias verdaderas suelen mantener un tono serio y objetivo, lo que puede provocar confusiones con aquellas fake news que adoptan un estilo aparentemente informativo.
 
 | Clase | Precisión |
 |-------|-----------|
