@@ -172,8 +172,12 @@ Para reproducir los experimentos del proyecto, se recomienda el siguiente entorn
 - HuggingFace Transformers: para cargar el tokenizador y modelo preentrenado BERT en español, y realizar el fine-tuning de la secuencia clasificadora.
 - Opcionalmente, sklearn.metrics y otras librerías auxiliares para cálculo de métricas y reporte de resultados.
 
-Los pasos generales para ejecutar serían: **1. Preparar los datos**: Colocar el archivo de dataset público
-en el directorio del proyecto y ajustar la ruta en el código de carga (	) si fuera necesario. **2. Preprocesar y vectorizar**: Ejecutar las celdas o scripts que limpian los textos y generan las representaciones TF-IDF, entrenan Word2Vec, obtienen embeddings de BERT, etc. **3. Entrenar los modelos**: Correr secuencialmente el entrenamiento del Random Forest, la red MLP (asegurándose de tener disponible una GPU para acelerar PyTorch si es posible) y el fine-tuning de BERT. Cada sección del código entrena uno de los modelos descritos. **4. Evaluar resultados**: Finalmente, ejecutar las celdas de evaluación que imprimen las métricas (accuracy, F1, ROC-AUC) y comparan los modelos. También revisar las gráficas generadas, como las importancias de palabras en Random Forest o matrices de confusión si se incluyeron, para una comprensión cualitativa.
+Los pasos generales para ejecutar serían: 
+**1. Preparar los datos**: Colocar el archivo de dataset público
+en el directorio del proyecto y ajustar la ruta en el código de carga (	) si fuera necesario. 
+**2. Preprocesar y vectorizar**: Ejecutar las celdas o scripts que limpian los textos y generan las representaciones TF-IDF, entrenan Word2Vec, obtienen embeddings de BERT, etc. 
+**3. Entrenar los modelos**: Correr secuencialmente el entrenamiento del Random Forest, la red MLP (asegurándose de tener disponible una GPU para acelerar PyTorch si es posible) y el fine-tuning de BERT. Cada sección del código entrena uno de los modelos descritos. 
+**4. Evaluar resultados**: Finalmente, ejecutar las celdas de evaluación que imprimen las métricas (accuracy, F1, ROC-AUC) y comparan los modelos. También revisar las gráficas generadas, como las importancias de palabras en Random Forest o matrices de confusión si se incluyeron, para una comprensión cualitativa.
 
 
 ## Fuente de datos
