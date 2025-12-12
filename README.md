@@ -139,9 +139,6 @@ Las siguientes curvas ROC y matrices de confusión se han calculado sobre los co
 #### BERT fine-tuning
 <div align="center">
     <img src="./images/test_trans.png" width="300" />
-</div>
-
-<div align="center">
     <img src="./images/test_trans_cm.png" width="300" />
 </div>
 
