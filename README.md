@@ -77,6 +77,7 @@ Las siguientes curvas ROC y matrices de confusión se han calculado sobre los co
     <img src="./images/val_tifidf_rf_cm.png" width="300" />
     <img src="./images/test_tifidf_rf_cm.png" width="300" />
 </div>
+
 - MLP
 <div align="center">
     <img src="./images/val_tifidf_nn.png" width="300" />
